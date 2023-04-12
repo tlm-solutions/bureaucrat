@@ -88,7 +88,7 @@ impl ReceiveWaypoint for Bureaucrat {
             }
         };
 
-        waypoints.retain(|x| now - (x.time as u128) > TIME_THRESHOLD);
+        waypoints.retain(|x| now - (x.time as u128) > TIME_THRESHOLD && x.line != extracted.line && x.run != extracted.run);
         waypoints.push(Waypoint::from(extracted));
 
         let string_waypoints: String = match serde_json::to_string(&waypoints) {
