@@ -87,8 +87,12 @@ impl ReceiveWaypoint for Bureaucrat {
                 return Err(Status::internal("cannot get redis connection!"));
             }
         };
+        
+        let filter_lambda = |x: &Waypoint| -> bool {
+            (now - (x.time as u128) < TIME_THRESHOLD) && !( x.line == extracted.line && x.run == extracted.run) 
+        };
 
-        waypoints.retain(|x| { (now - (x.time as u128) < TIME_THRESHOLD) && x.line != extracted.line && x.run != extracted.run });
+        waypoints.retain(filter_lambda);
         waypoints.push(Waypoint::from(extracted));
 
         let string_waypoints: String = match serde_json::to_string(&waypoints) {
