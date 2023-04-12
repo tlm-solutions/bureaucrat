@@ -88,12 +88,17 @@ impl ReceiveWaypoint for Bureaucrat {
         waypoints.retain(|x| now - (x.time as u128) > TIME_THRESHOLD);
         waypoints.push(Waypoint::from(extracted));
 
-        let string_waypoints: Vec<String> = waypoints
-            .iter()
-            .map(|x| serde_json::to_string(x).unwrap())
-            .collect();
+        let string_waypoints: String = match serde_json::to_string(&waypoints) {
+            Ok(value) => value,
+            Err(e) => {
+                error!("cannot serializize list of waypoints with error {:?}", e);
+                return Err(Status::internal("cannot get redis connection!"));
+            }
+        };
 
         let key: String = format!("r{}", region);
+
+        info!("inserting into redis: {}", &string_waypoints);
         match redis::cmd("SET")
             .arg(key)
             .arg(string_waypoints)
