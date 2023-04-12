@@ -85,7 +85,7 @@ impl ReceiveWaypoint for Bureaucrat {
             .map(|x| serde_json::from_str(x).unwrap())
             .collect::<Vec<Waypoint>>();
 
-        waypoints.retain(|x| now - (x.time as u128) < TIME_THRESHOLD);
+        waypoints.retain(|x| now - (x.time as u128) > TIME_THRESHOLD);
         waypoints.push(Waypoint::from(extracted));
 
         let string_waypoints: Vec<String> = waypoints
