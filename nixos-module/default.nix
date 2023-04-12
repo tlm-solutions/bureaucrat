@@ -72,7 +72,7 @@ in
           environment = {
             "RUST_LOG" = "${cfg.log_level}";
             "RUST_BACKTRACE" = if (cfg.log_level == "info") then "0" else "1";
-            "BUREAUCRAT_HOST" = "${cfg.host}:${toString cfg.port}";
+            "BUREAUCRAT_HOST" = "${cfg.grpc.host}:${toString cfg.grpc.port}";
             "REDIS_HOST" = "${cfg.redis.host}";
             "REDIS_PORT" = "${toString cfg.redis.port}";
           };
