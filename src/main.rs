@@ -5,7 +5,7 @@
 
 use std::env;
 
-use redis::cluster::ClusterClient;
+use redis::Client;
 use redis::Commands;
 
 use std::time::SystemTime;
@@ -29,15 +29,15 @@ pub fn get_redis_uri() -> String {
 }
 
 /// returns the redis connection pool
-pub fn connect_to_redis() -> Option<ClusterClient> {
-    let redis_uri = vec![get_redis_uri()];
-    ClusterClient::new(redis_uri).ok()
+pub fn connect_to_redis() -> Option<Client> {
+    let redis_uri = get_redis_uri();
+    Client::open(redis_uri).ok()
 }
 
 /// service struct holding the redis connection pool
 #[derive(Clone)]
 pub struct Bureaucrat {
-    redis_connection_pool: ClusterClient,
+    redis_connection_pool: Client,
 }
 
 impl Bureaucrat {
