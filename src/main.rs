@@ -115,7 +115,7 @@ async fn main() -> std::io::Result<()> {
     info!("Starting the bureaucrating service ... ");
 
     let default_grpc_bureaucrat_host = String::from("127.0.0.1:50053");
-    let grpc_bureaucrat_host = env::var("BUREAUCRABUREAUCRATT_HOST")
+    let grpc_bureaucrat_host = env::var("BUREAUCRAT_HOST")
         .unwrap_or(default_grpc_bureaucrat_host)
         .parse()
         .expect("cannot fetch bureaucrat host!");
