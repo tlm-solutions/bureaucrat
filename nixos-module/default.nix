@@ -9,19 +9,21 @@ in
       default = false;
       description = ''Wether to enable bureaucrat service'';
     };
-    host = mkOption {
-      type = types.str;
-      default = "127.0.0.1";
-      description = ''
-        To which IP bureaucrat should bind its grpc server.
-      '';
-    };
-    port = mkOption {
-      type = types.port;
-      default = 8080;
-      description = ''
-        To which port should bureaucrat bind its grpc server.
-      '';
+    grpc = {
+      host = mkOption {
+        type = types.str;
+        default = "127.0.0.1";
+        description = ''
+          To which IP bureaucrat should bind its grpc server.
+        '';
+      };
+      port = mkOption {
+        type = types.port;
+        default = 8080;
+        description = ''
+          To which port should bureaucrat bind its grpc server.
+        '';
+      };
     };
     redis = {
       host = mkOption {

@@ -23,6 +23,12 @@
       bureaucrat = package;
       default = package;
     };
+
+    nixosModules = rec {
+      default = funnel;
+      funnel = import ./nixos-module;
+    };
+
     devShells.default = pkgs.mkShell {
       nativeBuildInputs = (with packages.bureaucrat; nativeBuildInputs ++ buildInputs);
     };
