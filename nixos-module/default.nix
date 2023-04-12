@@ -74,7 +74,7 @@ in
             "RUST_BACKTRACE" = if (cfg.log_level == "info") then "0" else "1";
             "BUREAUCRAT_HOST" = "${cfg.host}:${toString cfg.port}";
             "REDIS_HOST" = "${cfg.redis.host}";
-            "REDIS_PORT" = "${toString cfg.redis.port}"
+            "REDIS_PORT" = "${toString cfg.redis.port}";
           };
 
           serviceConfig = {
