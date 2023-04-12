@@ -67,10 +67,10 @@ impl ReceiveWaypoint for Bureaucrat {
             }
         };
 
-        let waypoints_strings: Vec<String> =
+        let waypoints_strings: String =
             match redis_connection.get(format!("r{}", extracted.region)) {
                 Ok(value) => value,
-                Err(_) => Vec::new(),
+                Err(_) => "[]".to_string()
             };
 
         let now = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
@@ -80,10 +80,13 @@ impl ReceiveWaypoint for Bureaucrat {
 
         const TIME_THRESHOLD: u128 = 1000 * 60 * 5;
 
-        let mut waypoints: Vec<Waypoint> = waypoints_strings
-            .iter()
-            .map(|x| serde_json::from_str(x).unwrap())
-            .collect::<Vec<Waypoint>>();
+        let mut waypoints: Vec<Waypoint> = match serde_json::from_str(&waypoints_strings) {
+            Ok(value) => value,
+            Err(e) => {
+                error!("cannot deserializize list of waypoints with error {:?}", e);
+                return Err(Status::internal("cannot get redis connection!"));
+            }
+        };
 
         waypoints.retain(|x| now - (x.time as u128) > TIME_THRESHOLD);
         waypoints.push(Waypoint::from(extracted));
