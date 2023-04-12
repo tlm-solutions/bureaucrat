@@ -89,6 +89,7 @@ impl ReceiveWaypoint for Bureaucrat {
         };
         
         let filter_lambda = |x: &Waypoint| -> bool {
+            info!("now: {} old: {} diff: {} tresh: {}", &now, &x.time, (now - x.time as u128), TIME_THRESHOLD);
             (now - (x.time as u128) < TIME_THRESHOLD) && !( x.line == extracted.line && x.run == extracted.run) 
         };
 
