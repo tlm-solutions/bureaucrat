@@ -78,7 +78,7 @@ impl ReceiveWaypoint for Bureaucrat {
             Err(_) => panic!("SystemTime before UNIX EPOCH!"),
         };
 
-        const TIME_THRESHOLD: u128 = 1000 * 60 * 5;
+        const TIME_THRESHOLD: u128 = 1000 * 60 * 4;
 
         let mut waypoints: Vec<Waypoint> = match serde_json::from_str(&waypoints_strings) {
             Ok(value) => value,
@@ -89,13 +89,15 @@ impl ReceiveWaypoint for Bureaucrat {
         };
         
         let filter_lambda = |x: &Waypoint| -> bool {
-            info!("now: {} old: {} diff: {} tresh: {}", &now, &x.time, (now - x.time as u128), TIME_THRESHOLD);
             (now - (x.time as u128) < TIME_THRESHOLD) && !( x.line == extracted.line && x.run == extracted.run) 
         };
 
+        let old_size = waypoints.len();
         waypoints.retain(filter_lambda);
-        waypoints.push(Waypoint::from(extracted));
 
+        info!("removed {} waypoints from redis ... ", old_size - waypoints.len());
+        waypoints.push(Waypoint::from(extracted));
+        
         let string_waypoints: String = match serde_json::to_string(&waypoints) {
             Ok(value) => value,
             Err(e) => {
@@ -106,7 +108,6 @@ impl ReceiveWaypoint for Bureaucrat {
 
         let key: String = format!("r{}", region);
 
-        info!("inserting into redis: {}", &string_waypoints);
         match redis::cmd("SET")
             .arg(key)
             .arg(string_waypoints)
