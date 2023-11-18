@@ -67,11 +67,11 @@ impl ReceiveWaypoint for Bureaucrat {
             }
         };
 
-        let waypoints_strings: String =
-            match redis_connection.get(format!("r{}", extracted.region)) {
-                Ok(value) => value,
-                Err(_) => "[]".to_string()
-            };
+        let waypoints_strings: String = match redis_connection.get(format!("r{}", extracted.region))
+        {
+            Ok(value) => value,
+            Err(_) => "[]".to_string(),
+        };
 
         let now = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
             Ok(n) => n.as_millis(),
@@ -87,17 +87,21 @@ impl ReceiveWaypoint for Bureaucrat {
                 return Err(Status::internal("cannot get redis connection!"));
             }
         };
-        
+
         let filter_lambda = |x: &Waypoint| -> bool {
-            (now - (x.time as u128) < TIME_THRESHOLD) && !( x.line == extracted.line && x.run == extracted.run) 
+            (now - (x.time as u128) < TIME_THRESHOLD)
+                && !(x.line == extracted.line && x.run == extracted.run)
         };
 
         let old_size = waypoints.len();
         waypoints.retain(filter_lambda);
 
-        info!("removed {} waypoints from redis ... ", old_size - waypoints.len());
+        info!(
+            "removed {} waypoints from redis ... ",
+            old_size - waypoints.len()
+        );
         waypoints.push(Waypoint::from(extracted));
-        
+
         let string_waypoints: String = match serde_json::to_string(&waypoints) {
             Ok(value) => value,
             Err(e) => {
