@@ -48,6 +48,24 @@ impl Bureaucrat {
     }
 }
 
+/// calculates the distance between two coordinates
+pub fn distance(start_lat: f64, start_lon: f64, end_lat: f64, end_lon: f64) -> f64 {
+    const KILOMETERS: f64 = 6371.0;
+    const TO_METERS: f64 = 1.0 / 1000.0;
+    let r: f64 = KILOMETERS * TO_METERS;
+
+    let d_lat: f64 = (end_lat - start_lat).to_radians();
+    let d_lon: f64 = (end_lon - start_lon).to_radians();
+    let lat1: f64 = (start_lat).to_radians();
+    let lat2: f64 = (end_lat).to_radians();
+
+    let a: f64 = ((d_lat/2.0).sin()) * ((d_lat/2.0).sin()) + ((d_lon/2.0).sin()) * ((d_lon/2.0).sin()) * (lat1.cos()) * (lat2.cos());
+    let c: f64 = 2.0 * ((a.sqrt()).atan2((1.0-a).sqrt()));
+
+    return r * c;
+}
+
+
 #[tonic::async_trait]
 impl ReceiveWaypoint for Bureaucrat {
     async fn receive_waypoint(
@@ -79,6 +97,7 @@ impl ReceiveWaypoint for Bureaucrat {
         };
 
         const TIME_THRESHOLD: u128 = 1000 * 60 * 4;
+        const SPACE_TRESHHOLD: f64 = 400.0;
 
         let mut waypoints: Vec<Waypoint> = match serde_json::from_str(&waypoints_strings) {
             Ok(value) => value,
@@ -90,7 +109,7 @@ impl ReceiveWaypoint for Bureaucrat {
 
         let filter_lambda = |x: &Waypoint| -> bool {
             (now - (x.time as u128) < TIME_THRESHOLD)
-                && !(x.line == extracted.line && x.run == extracted.run)
+                && !(x.line == extracted.line && x.run == extracted.run && distance(extracted.lat, extracted.lon, x.lat, x.lon) > SPACE_TRESHHOLD)
         };
 
         let old_size = waypoints.len();
