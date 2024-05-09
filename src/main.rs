@@ -109,7 +109,7 @@ impl ReceiveWaypoint for Bureaucrat {
 
         let filter_lambda = |x: &Waypoint| -> bool {
             (now - (x.time as u128) < TIME_THRESHOLD)
-                && (x.line == extracted.line
+                || (x.line == extracted.line
                     && x.run == extracted.run
                     && distance(extracted.lat, extracted.lon, x.lat, x.lon) < SPACE_TRESHHOLD)
         };
