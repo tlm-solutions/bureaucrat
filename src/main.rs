@@ -96,8 +96,8 @@ impl ReceiveWaypoint for Bureaucrat {
             Err(_) => panic!("SystemTime before UNIX EPOCH!"),
         };
 
-        const TIME_THRESHOLD: u128 = 1000 * 60 * 5;
-        const SPACE_TRESHHOLD: f64 = 400.0;
+        const TIME_THRESHOLD: u128 = 1000 * 60 * 3;
+        const SPACE_TRESHHOLD: f64 = 200.0;
 
         let mut waypoints: Vec<Waypoint> = match serde_json::from_str(&waypoints_strings) {
             Ok(value) => value,
